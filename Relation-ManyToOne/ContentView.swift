@@ -56,7 +56,7 @@ struct ContentView: View {
             .navigationTitle("People")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Seed") { seedSampleData() }
+                   
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingAddPerson = true }) {
@@ -94,130 +94,12 @@ struct ContentView: View {
         try? context.save()
     }
 
-    private func seedSampleData() {
-        // Only seed if empty to avoid duplicates
-        guard people.isEmpty else { return }
-        let alice = Person(name: "Alice", age: 30)
-        let bob = Person(name: "Bob", age: 42)
-        let c1 = CarModel(name: "Civic", owner: alice)
-        let c2 = CarModel(name: "Model 3", owner: alice)
-        let c3 = CarModel(name: "Corolla", owner: bob)
-        context.insert(alice)
-        context.insert(bob)
-        context.insert(c1)
-        context.insert(c2)
-        context.insert(c3)
-        try? context.save()
-    }
+   
 }
 
-private struct AddPersonView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var context
 
-    @State private var name: String = ""
-    @State private var age: Int = 30
 
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("Name", text: $name)
-                Stepper(value: $age, in: 1...120) {
-                    HStack {
-                        Text("Age")
-                        Spacer()
-                        Text("\(age)")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .navigationTitle("New Person")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") { add() }
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            }
-        }
-    }
 
-    private func add() {
-        let p = Person(name: name.trimmingCharacters(in: .whitespacesAndNewlines), age: age)
-        context.insert(p)
-        try? context.save()
-        dismiss()
-    }
-}
-
-struct PersonDetailView: View {
-    @Environment(\.modelContext) private var context
-    @State var person: Person
-
-    @Query(sort: [SortDescriptor(\CarModel.name, order: .forward)]) private var cars: [CarModel]
-    @State private var newCarName: String = ""
-
-    var body: some View {
-        Form {
-            Section("Info") {
-                TextField("Name", text: Binding(
-                    get: { person.name },
-                    set: { person.name = $0 }
-                ))
-                Stepper(value: Binding(
-                    get: { person.age },
-                    set: { person.age = $0 }
-                ), in: 1...120) {
-                    HStack {
-                        Text("Age")
-                        Spacer()
-                        Text("\(person.age)")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-
-            Section("Cars") {
-                if person.cars.isEmpty {
-                    Text("No cars yet")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(person.cars) { car in
-                        HStack {
-                            Text(car.name)
-                            Spacer()
-                            Button(role: .destructive) {
-                                context.delete(car)
-                                try? context.save()
-                            } label: {
-                                Image(systemName: "trash")
-                            }
-                        }
-                    }
-                }
-                HStack {
-                    TextField("New car name", text: $newCarName)
-                    Button("Add") { addCar() }
-                        .disabled(newCarName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-        }
-        .navigationTitle(person.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { try? context.save() }
-    }
-
-    private func addCar() {
-        let name = newCarName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { return }
-        let car = CarModel(name: name, owner: person)
-        context.insert(car)
-        newCarName = ""
-        try? context.save()
-    }
-}
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
