@@ -73,3 +73,8 @@ struct PersonDetailView: View {
         try? context.save()
     }
 }
+
+#Preview {
+    PersonDetailView(person: Person.Root(name: "Tom", age: 99))
+        .modelContainer(for: [Person.self, CarModel.self], inMemory: true)
+}

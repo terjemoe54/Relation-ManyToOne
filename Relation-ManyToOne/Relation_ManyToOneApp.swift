@@ -12,9 +12,10 @@ import SwiftData
 struct Relation_ManyToOneApp: App {
     var body: some Scene {
         WindowGroup {
-         // ContentView()
+           // ContentView()
             RegistrationFormView()
-                .modelContainer(for: [Person.self])
+            
+            .modelContainer(for: [Person.self])
         }
     }
     init() {

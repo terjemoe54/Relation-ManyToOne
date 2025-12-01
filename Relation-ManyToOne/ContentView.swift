@@ -97,20 +97,6 @@ struct ContentView: View {
    
 }
 
-
-
-
-
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Person.self, CarModel.self, configurations: config)
-    let context = container.mainContext
-
-    let alice = Person(name: "Preview Alice", age: 29)
-    let car = CarModel(name: "Preview Car", owner: alice)
-    context.insert(alice)
-    context.insert(car)
-
-    return ContentView()
-        .modelContainer(container)
+    ContentView()
 }
